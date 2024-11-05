@@ -7,15 +7,15 @@ ENV PYTHONFAULTHANDLER=1 \
     PIP_NO_CACHE_DIR=1
 
 # Копируем файл с зависимостями и устанавливаем их
-COPY ./server/requirements.txt /
+COPY ./requirements.txt /
 
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Копируем исходный код приложения
-COPY ./server/src /wishu
+COPY ./src /src
 
 # Устанавливаем рабочую директорию
-WORKDIR /wishu
+WORKDIR /src
 
 # Указываем точку монтирования для данных
 VOLUME ["./CommonData"]
@@ -23,5 +23,14 @@ VOLUME ["./CommonData"]
 # Открываем порт для приложения (например, 8000)
 EXPOSE 8000
 
+# Копируем переменные окружения
+COPY ./.env /
+
+# Запускаем миграцию БД
+RUN ["python3", "manage.py", "migrate"]
+
+# Восстанавливаем данные из бэкапа
+RUN ["python3", "manage.py", "loaddata", "backup.json"]
+
 # Указываем команду для запуска приложения
-ENTRYPOINT ["python3", "manage.py"]
+ENTRYPOINT ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
