@@ -30,9 +30,6 @@ env.read_env(ROOT_DIR(".env"))
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-print(BASE_DIR)
-print(ROOT_DIR)
-print(env)
 SECRET_KEY = env('SECRET_KEY')
 
 
