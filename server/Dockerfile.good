@@ -18,19 +18,10 @@ COPY ./src /src
 WORKDIR /src
 
 # Указываем точку монтирования для данных
-VOLUME ["./CommonData"]
+VOLUME ["../static"]
 
 # Открываем порт для приложения (например, 8000)
 EXPOSE 8000
-
-# Копируем переменные окружения
-COPY ./.env /
-
-# Запускаем миграцию БД
-RUN ["python3", "manage.py", "migrate"]
-
-# Восстанавливаем данные из бэкапа
-RUN ["python3", "manage.py", "loaddata", "backup.json"]
 
 # Указываем команду для запуска приложения
 ENTRYPOINT ["python3", "manage.py", "runserver", "0.0.0.0:8000"]

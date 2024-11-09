@@ -23,7 +23,7 @@ API позволяет пользователю:
 ## How to use
 
 1. Скопировать `.env.sample` и переименовать в `.env`:
-    ```shell
+    ```shell 
     cp .env.sample .env
     ```
 
@@ -33,8 +33,25 @@ API позволяет пользователю:
    ```
    
 3. Поднять контейнер:
-    ```shell
-   docker run -p 8000:8000 wishu:good
+    ```bash
+   docker run --env-file .env -p 8000:8000 --name wishu wishu:good
+    ```
+4. Для того чтобы провести миграции и заполнить данными  БД, нужно выполнить следующие команды.
+
+   Применить миграции для создания таблиц в БД:
+   ```bash
+    docker exec -it wishu python3 manage.py migrate
+    ```
+	
+    Применить миграции для создания таблиц в БД:
+    ```bash
+    docker exec -it wishu python3 manage.py loaddata backup.json
     ```
 
 Swagger доступен по адресу [http://localhost:8000/api/v1/swagger](http://localhost:8000/api/v1/swagger).
+
+Для проверки работоспособности рекомендуем такой запрос: 
+
+```bash
+curl http://localhost:8000/api/v1/lists/1/
+```
