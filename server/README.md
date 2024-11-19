@@ -27,27 +27,11 @@ API позволяет пользователю:
     cp .env.sample .env
     ```
 
-2. Сборка контейнеров:
-   ```bash
-   docker build -t wishu:good -f Dockerfile.good .
-   ```
+2. Собрать и поднять контейнеры:
+    ```bash
+   docker compose up --build
+    ```
    
-3. Поднять контейнер:
-    ```bash
-   docker run --env-file .env -p 8000:8000 --name wishu wishu:good
-    ```
-4. Для того чтобы провести миграции и заполнить данными  БД, нужно выполнить следующие команды.
-
-   Применить миграции для создания таблиц в БД:
-   ```bash
-    docker exec -it wishu python3 manage.py migrate
-    ```
-	
-    Применить миграции для создания таблиц в БД:
-    ```bash
-    docker exec -it wishu python3 manage.py loaddata backup.json
-    ```
-
 Swagger доступен по адресу [http://localhost:8000/api/v1/swagger](http://localhost:8000/api/v1/swagger).
 
 Для проверки работоспособности рекомендуем такой запрос: 
