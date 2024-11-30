@@ -5,6 +5,4 @@ metadata:
   labels:
     app: postgres
 data:
-  POSTGRES_DB: "nextcloud"         
-  POSTGRES_USER: "postgres"        
-  POSTGRES_PASSWORD: "admin"       
+  POSTGRES_DB: "postgres"         

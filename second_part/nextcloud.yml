@@ -41,34 +41,51 @@ spec:
               protocol: TCP
           env:
             - name: NEXTCLOUD_UPDATE
-              value: '1'
+              valueFrom:
+                configMapKeyRef:
+                  name: nextcloud-configmap
+                  key: NEXTCLOUD_UPDATE
             - name: ALLOW_EMPTY_PASSWORD
-              value: 'yes'
+              valueFrom:
+                configMapKeyRef:
+                  name: nextcloud-configmap
+                  key: ALLOW_EMPTY_PASSWORD
             - name: POSTGRES_HOST
-              value: postgres-service  
+              value: postgres-service
             - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
                   name: postgres-configmap
-                  key: POSTGRES_DB  
+                  key: POSTGRES_DB
             - name: POSTGRES_USER
               valueFrom:
-                configMapKeyRef:
-                  name: postgres-configmap
-                  key: POSTGRES_USER  
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
-                configMapKeyRef:
-                  name: postgres-configmap
-                  key: POSTGRES_PASSWORD 
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
             - name: NEXTCLOUD_ADMIN_USER
-              value: nextcloud_admin 
+              value: nextcloud_admin
             - name: NEXTCLOUD_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: nextcloud-secret
-                  key: NEXTCLOUD_ADMIN_PASSWORD  # Пароль администратора Nextcloud из Secret
+                  key: NEXTCLOUD_ADMIN_PASSWORD
           imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 5
       restartPolicy: Always
       dnsPolicy: ClusterFirst
-
