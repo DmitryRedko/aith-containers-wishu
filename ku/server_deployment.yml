@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wishu-server
+  labels:
+    app: wishu-server
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wishu-server
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: wishu-server
+        tier: backend
+    spec:
+      initContainers:
+        - name: init-db
+          image: wishu:latest
+          command: ['sh', '-c', './init_db.sh']
+          imagePullPolicy: Never
+          env:
+            - name: DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  name: wishu-configmap
+                  key: DEBUG
+            - name: ALLOWED_HOSTS
+              valueFrom:
+                configMapKeyRef:
+                  name: wishu-configmap
+                  key: ALLOWED_HOSTS
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: server-secret
+                  key: SECRET_KEY
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: server-secret
+                  key: DATABASE_URL
+
+          volumeMounts:
+          - name: static-storage
+            mountPath: /static
+          - name: media-storage
+            mountPath: /media
+
+      containers:
+        - name: wishu-server
+          image: wishu:latest
+          command: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+          imagePullPolicy: Never
+          ports:
+          - containerPort: 8000
+          env:
+            - name: DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  name: wishu-configmap
+                  key: DEBUG
+            - name: ALLOWED_HOSTS
+              valueFrom:
+                configMapKeyRef:
+                  name: wishu-configmap
+                  key: ALLOWED_HOSTS
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: server-secret
+                  key: SECRET_KEY
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: server-secret
+                  key: DATABASE_URL
+          volumeMounts:
+          - name: static-storage
+            mountPath: /static
+          - name: media-storage
+            mountPath: /media
+
+      volumes:
+      - name: static-storage
+        persistentVolumeClaim:
+          claimName: static-data-pvc
+      - name: media-storage
+        persistentVolumeClaim:
+          claimName: media-data-pvc

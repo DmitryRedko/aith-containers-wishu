@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wishu-configmap
+  labels:
+    app: wishu-server
+    tier: backend
+data:
+  DEBUG: "True"
+  ALLOWED_HOSTS: "0.0.0.0,localhost,127.0.0.1"
