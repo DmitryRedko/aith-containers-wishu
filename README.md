@@ -1,24 +1,66 @@
 # aith-containers-wishu
 
-Подробнее о системе и её запуске описано [здесь](server/README.md).
-Compose-файл располагается в `/server`.
+Подробнее о системе описано [здесь](server/README.md).
 
-# Docker Compose
+# WISHU Kubernetes Edition
 
-К представленному раннее сервису добавился init контейнер и база данных PostgreSQL 
+Представленный раннее сервис теперь развёрнут в minikube. 
 
-## Ответы на вопросы
+## How to use
 
-1.  Можно ли ограничивать ресурсы (например, память или CPU) для сервисов в docker-compose.yml? Если нет, то почему, если да, то как? 
+1. Собрать образ сервера:
 
-Да, возможно. Причем согласно [документации](https://docs.docker.com/reference/compose-file/deploy/#resources) ресурсы можно ограничить и сверху (`reservations`), и снизу (`limits`).
-Ограничить можно количество доступных ядер CPU, объём выделенной памяти, количество PID. 
+    ```bash
+    docker build -t wishu .
+    ```
 
+2. Запустить minikube и прокинуть образ:
 
-2. Как можно запустить только определенный сервис из docker-compose.yml, не запуская остальные?
+    ```bash
+    minikube start
+    minikube image load wishu
+    ```
 
-Да, это можно сделать. Например, для запуска только базы данных можно выполнить следующую команду:
+3. Создать необходимые объекты через cli:
+
+    ```bash
+    kubectl apply -f pg_configmap.yml
+    kubectl apply -f server_configmap.yml
+    kubectl apply -f pg_secret.yml
+    kubectl apply -f server_secret.yml
+
+    kubectl apply -f pg_volume.yml
+    kubectl apply -f pg_volume_claim.yml
+    kubectl apply -f server_volume_claim.yml
+
+    kubectl apply -f pg_service.yml
+    kubectl apply -f server_service.yml
+
+    kubectl apply -f pg_deployment.yml
+    kubectl apply -f server_deployment.yml
+    ```
+
+3. Пробросить для доступа к Swagger:
+
+    ```bash
+    kubectl port-forward service/server-service 8000:8000
+    ```
+
+    Либо, зная имя пода:
+
+    ```bash
+    kubectl get pods
+    kubectl port-forward wishu-server-5df57c5869-4l4bm  8000:8000
+    ```
+
+После будет Swagger доступен по адресу [http://localhost:8000/api/v1/swagger](http://localhost:8000/api/v1/swagger).
+
+Для проверки работоспособности рекомендуем такой запрос: 
 
 ```bash
-docker compose up db
+curl http://localhost:8000/api/v1/lists/1/
 ```
+
+Или в интерфейсе Swagger:
+
+![swagger request](ku/image.png)
