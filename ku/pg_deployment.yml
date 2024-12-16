@@ -21,8 +21,6 @@ spec:
         - name: postgres-container
           image: postgres:14
           imagePullPolicy: "IfNotPresent"
-          ports:
-            - containerPort: 5432
           env:
             - name: POSTGRES_DB
               valueFrom:

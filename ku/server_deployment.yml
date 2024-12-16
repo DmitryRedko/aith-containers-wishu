@@ -18,6 +18,9 @@ spec:
         tier: backend
     spec:
       initContainers:
+        - name: wait-for-postgres
+          image: busybox:1.31
+          command: ['sh', '-c', 'until nc -z postgres-service 5432; do echo postgres is still loading; sleep 2; done;']
         - name: init-db
           image: wishu:latest
           command: ['sh', '-c', './init_db.sh']
